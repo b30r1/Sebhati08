@@ -1,1 +1,332 @@
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>السبحة الإلكترونية المطورة</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
 
+        body {
+            background: linear-gradient(135deg, #141e30, #243b55);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #fff;
+            padding: 20px;
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.06);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 30px;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #00f2fe;
+            text-shadow: 0 2px 10px rgba(0, 242, 254, 0.3);
+        }
+
+        .select-box, .custom-input {
+            width: 100%;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 15px;
+            transition: 0.3s;
+        }
+
+        .select-box option {
+            background: #1c2d42;
+            color: #fff;
+        }
+
+        .custom-input::placeholder {
+            color: rgba(255, 255, 255, 0.6);
+        }
+
+        .counter-box {
+            position: relative;
+            width: 180px;
+            height: 180px;
+            margin: 25px auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+        }
+
+        .progress-ring {
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform-origin: 50% 50%;
+        }
+
+        .counter-value {
+            font-size: 48px;
+            font-weight: bold;
+            user-select: none;
+            text-shadow: 0 0 15px rgba(255,255,255,0.3);
+        }
+
+        .target-text {
+            font-size: 14px;
+            color: #4facfe;
+            margin-top: -5px;
+            margin-bottom: 15px;
+        }
+
+        .main-btn {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, #00f2fe, #4facfe);
+            border: none;
+            border-radius: 50px;
+            color: #141e30;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(0, 242, 254, 0.3);
+            transition: transform 0.1s, box-shadow 0.3s;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .main-btn:active {
+            transform: scale(0.96);
+        }
+
+        .control-panel {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            gap: 10px;
+        }
+
+        .sub-btn {
+            flex: 1;
+            padding: 10px;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        .sub-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        .active-target {
+            border-color: #00f2fe !important;
+            color: #00f2fe;
+            background: rgba(0, 242, 254, 0.1) !important;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>السبحة الإلكترونية</h1>
+        
+        <!-- اختيار الذكر -->
+        <select class="select-box" id="zikrSelect" onchange="handleZikrChange()">
+            <option value="سبحان الله">سبحان الله</option>
+            <option value="الحمد لله">الحمد لله</option>
+            <option value="الله أكبر">الله أكبر</option>
+            <option value="لا إله إلا الله">لا إله إلا الله</option>
+            <option value="أستغفر الله">أستغفر الله</option>
+            <option value="اللهم صلِّ وسلم على نبينا محمد">اللهم صلِّ وسلم على نبينا محمد</option>
+            <option value="custom">✍️ كتابة ذكر مخصص...</option>
+        </select>
+
+        <!-- حقل نص للذكر المخصص -->
+        <input type="text" id="customZikrInput" class="custom-input" placeholder="اكتب ذكرك الخاص هنا..." style="display: none;" oninput="saveCustomZikr()">
+
+        <!-- تحديد الهدف -->
+        <div class="control-panel">
+            <button class="sub-btn active-target" id="target-free" onclick="setTarget(0, 'free')">حُر</button>
+            <button class="sub-btn" id="target-33" onclick="setTarget(33, '33')">33</button>
+            <button class="sub-btn" id="target-100" onclick="setTarget(100, '100')">100</button>
+        </div>
+
+        <!-- العداد التفاعلي -->
+        <div class="counter-box" onclick="countUp()">
+            <svg class="progress-ring" width="180" height="180">
+                <circle class="progress-ring__circle" stroke="rgba(255,255,255,0.1)" stroke-width="8" fill="transparent" r="82" cx="90" cy="90"/>
+                <circle id="progressCircle" class="progress-ring__circle" stroke="#00f2fe" stroke-width="8" fill="transparent" r="82" cx="90" cy="90" stroke-dasharray="515.22" stroke-dashoffset="515.22" stroke-linecap="round"/>
+            </svg>
+            <div class="counter-value" id="counterDisplay">0</div>
+        </div>
+
+        <div class="target-text" id="targetLabel">الهدف: مفتوح</div>
+
+        <!-- أزرار التحكم -->
+        <button class="main-btn" onclick="countUp()">اضغط للتسبيح</button>
+        
+        <div class="control-panel">
+            <button class="sub-btn" onclick="resetCounter()">تصفير العداد</button>
+            <button class="sub-btn" id="soundBtn" onclick="toggleSound()">🔊 الصوت: مفعّل</button>
+        </div>
+    </div>
+
+    <script>
+        // المتغيرات الأساسية
+        let count = parseInt(localStorage.getItem('sebha_count')) || 0;
+        let target = parseInt(localStorage.getItem('sebha_target')) || 0;
+        let targetType = localStorage.getItem('sebha_target_type') || 'free';
+        let soundEnabled = localStorage.getItem('sebha_sound') !== 'false';
+        
+        const counterDisplay = document.getElementById('counterDisplay');
+        const progressCircle = document.getElementById('progressCircle');
+        const targetLabel = document.getElementById('targetLabel');
+        const zikrSelect = document.getElementById('zikrSelect');
+        const customZikrInput = document.getElementById('customZikrInput');
+        const circleRadius = 82;
+        const circumference = 2 * Math.PI * circleRadius;
+
+        // توليد صوت كليك برمجي داخلي دون ملف خارجي
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        function playClickSound(freq = 400, duration = 0.05) {
+            if (!soundEnabled) return;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = freq;
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        // عند بدء تشغيل الصفحة
+        window.onload = function() {
+            counterDisplay.innerText = count;
+            restoreZikr();
+            setTarget(target, targetType);
+            updateProgress();
+            updateSoundButtonStatus();
+        };
+
+        // وظيفة العد تصاعدياً
+        function countUp() {
+            count++;
+            counterDisplay.innerText = count;
+            localStorage.setItem('sebha_count', count);
+            
+            playClickSound(450, 0.04);
+            updateProgress();
+
+            // التحقق من الوصول للهدف
+            if (target > 0 && count === target) {
+                setTimeout(() => {
+                    playClickSound(800, 0.2); // صوت تنبيه مميز عند النهاية
+                    if (navigator.vibrate) navigator.vibrate([100, 50, 100]); // اهتزاز الهاتف
+                    alert('الحمد لله، لقد أتممت هدفك الحالي!');
+                }, 10);
+            }
+        }
+
+        // تحديث الدائرة الزرقاء حول العداد
+        function updateProgress() {
+            if (target === 0) {
+                progressCircle.style.strokeDashoffset = circumference; // تبقى فارغة في الوضع الحر
+                return;
+            }
+            const progress = count / target;
+            const offset = circumference - (Math.min(progress, 1) * circumference);
+            progressCircle.style.strokeDashoffset = offset;
+        }
+
+        // تصفير العداد
+        function resetCounter() {
+            if(confirm('هل تريد تصفير عداد التسبيح الحالي؟')) {
+                count = 0;
+                counterDisplay.innerText = count;
+                localStorage.setItem('sebha_count', count);
+                updateProgress();
+            }
+        }
+
+        // تغيير الهدف (حُر، 33، 100)
+        function setTarget(value, type) {
+            target = value;
+            targetType = type;
+            localStorage.setItem('sebha_target', target);
+            localStorage.setItem('sebha_target_type', targetType);
+
+            // تحديث تصميم الأزرار النشطة
+            document.querySelectorAll('.control-panel .sub-btn').forEach(btn => btn.classList.remove('active-target'));
+            document.getElementById(`target-${type}`).classList.add('active-target');
+
+            targetLabel.innerText = target === 0 ? "الهدف: مفتوح" : `الهدف الحالي: ${target}`;
+            updateProgress();
+        }
+
+        // التحكم بقائمة الأذكار
+        function handleZikrChange() {
+            localStorage.setItem('sebha_selected_zikr', zikrSelect.value);
+            if (zikrSelect.value === 'custom') {
+                customZikrInput.style.display = 'block';
+                customZikrInput.focus();
+            } else {
+                customZikrInput.style.display = 'none';
+            }
+        }
+
+        function saveCustomZikr() {
+            localStorage.setItem('sebha_custom_zikr_text', customZikrInput.value);
+        }
+
+        function restoreZikr() {
+            const savedZikr = localStorage.getItem('sebha_selected_zikr');
+            if (savedZikr) {
+                zikrSelect.value = savedZikr;
+                if (savedZikr === 'custom') {
+                    customZikrInput.style.display = 'block';
+                    customZikrInput.value = localStorage.getItem('sebha_custom_zikr_text') || '';
+                }
+            }
+        }
+
+        // تفعيل أو كتم الصوت
+        function toggleSound() {
+            soundEnabled = !soundEnabled;
+            localStorage.setItem('sebha_sound', soundEnabled);
+            updateSoundButtonStatus();
+        }
+
+        function updateSoundButtonStatus() {
+            const soundBtn = document.getElementById('soundBtn');
+            soundBtn.innerText = soundEnabled ? "🔊 الصوت: مفعّل" : "🔇 الصوت: مكتوم";
+        }
+    </script>
+</body>
+</html>
